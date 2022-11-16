@@ -28,7 +28,10 @@ class House(models.Model):
     class Meta:
         managed = False
         db_table = 'house'
-        unique_together = (('street', 'house_number'),)
+        unique_together = (('street_id', 'house_number'),)
+
+    def __str__(self):
+        return f"{self.street_id}, {self.house_number}"
 
 
 class Route(models.Model):
@@ -39,6 +42,8 @@ class Route(models.Model):
         managed = False
         db_table = 'route'
 
+    def __str__(self):
+        return self.route_name
 
 class RouteComponents(models.Model):
     route = models.OneToOneField(Route, models.DO_NOTHING, primary_key=True)
@@ -48,4 +53,7 @@ class RouteComponents(models.Model):
     class Meta:
         managed = False
         db_table = 'route_components'
-        unique_together = (('route', 'follow_up_number'),)
+        unique_together = (('route_id', 'follow_up_number'),)
+
+    def __str__(self):
+        return f"{self.route_id}: {self.follow_up_number}; {self.house_id}"

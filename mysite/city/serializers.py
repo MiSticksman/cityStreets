@@ -6,11 +6,13 @@ class StreetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Street
         fields = ('street_id', 'street_name')
-        
+
 class HouseSerializer(serializers.ModelSerializer):
+    # house = serializers.SlugRelatedField(slug_field="street_name", read_only=True)
+
     class Meta:
         model = House
-        fields = ('house_id', 'street_id', 'house_number')
+        fields = ('house_id', 'street', 'house_number')
 
 
 class RouteSerializer(serializers.ModelSerializer):
@@ -21,4 +23,4 @@ class RouteSerializer(serializers.ModelSerializer):
 class RouteComponentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = RouteComponents
-        fields = ('route_id', 'follow_up_number', 'house_id')
+        fields = ('route', 'follow_up_number', 'house')
