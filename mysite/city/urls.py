@@ -18,6 +18,6 @@ urlpatterns = [
     path('', include(router_street.urls)),
     path('', include(router_house.urls)),
     path('', include(router_route.urls)),
-    # path('', include(router_route_comp.urls)),
+    path('', include(router_route_comp.urls)),
 ]
 
