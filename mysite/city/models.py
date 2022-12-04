@@ -4,14 +4,15 @@ from django.db import models
 
 class Street(models.Model):
     street_id = models.AutoField(primary_key=True)
-    street_name = models.CharField(max_length=50)
+    street_name = models.CharField(max_length=50, unique=True)
 
     class Meta:
         managed = False
         db_table = 'street'
+        unique_together = (('street_id', 'street_name'),)
 
     def __str__(self):
-        return self.street_name
+        return f"{self.street_name}"
 
 
 class House(models.Model):
@@ -30,7 +31,7 @@ class House(models.Model):
 
 class Route(models.Model):
     route_id = models.AutoField(primary_key=True)
-    route_name = models.CharField(max_length=50, blank=True, null=True)
+    route_name = models.CharField(max_length=50, blank=True, null=True, unique=True)
 
     class Meta:
         managed = False

@@ -12,7 +12,7 @@ SECRET_KEY = 'django-insecure-2#eg_v_!2p8tu#9ykl(kzdc4s3=v)s@zy(^^%6%gl11-etu$59
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 INSTALLED_APPS = [
@@ -62,10 +62,6 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-CORS_ORIGIN_WHITELIST = (
-       'http://localhost:3000',
-)
-
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
@@ -79,6 +75,7 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+
 
 
 # Password validation
@@ -124,6 +121,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
+        'rest_framework.permissions.IsAuthenticated',
         # 'rest_framework.renderers.BrowsableAPIRenderer',
     ]
 }

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import JsonResponse
-from rest_framework import generics
+from rest_framework import generics, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
@@ -17,6 +17,8 @@ from .serializers import StreetSerializer
 from .models import Street, House, Route, RouteComponents
 
 
+
+
 class StreetView(viewsets.ModelViewSet):
     serializer_class = StreetSerializer
     queryset = Street.objects.all().order_by('street_name')
@@ -26,6 +28,11 @@ class HouseView(viewsets.ModelViewSet):
     serializer_class = HouseSerializer
     queryset = House.objects.all()
 
+
+    # def get_serializer_context(self):
+    #     return {
+    #         'street_id': self.request.street.street_id
+    #     }
 
 class RouteView(viewsets.ModelViewSet):
     serializer_class = RouteSerializer
