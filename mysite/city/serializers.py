@@ -15,6 +15,12 @@ class HouseSerializer(serializers.ModelSerializer):
         model = House
         fields = ('house_id', 'street', 'house_number', 'street_name')
 
+    # def create(self, validated_data):
+    #     street_data = validated_data.get('street')
+    #     print(street_data)
+    #     street = Street.objects.get(pk=street_data.street_id)
+    #     House.objects.create(street=street, **validated_data)
+
 class RouteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Route
@@ -23,8 +29,10 @@ class RouteSerializer(serializers.ModelSerializer):
 
 class RouteComponentsSerializer(serializers.ModelSerializer):
     # route = RouteSerializer()
+    # house = HouseSerializer()
     route_name = serializers.CharField(source='route.route_name', read_only=True)
-
+    house_number = serializers.FloatField(source='house.house_number', read_only=True)
+    street_name = serializers.CharField(source='house.street.street_name', read_only=True)
     class Meta:
         model = RouteComponents
-        fields = ('route', 'follow_up_number', 'house', 'route_name')
+        fields = ('route_comp_id', 'route', 'follow_up_number', 'house', 'route_name', 'house_number', 'street_name')

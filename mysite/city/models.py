@@ -17,7 +17,7 @@ class Street(models.Model):
 
 class House(models.Model):
     house_id = models.AutoField(primary_key=True)
-    street = models.ForeignKey(Street, models.DO_NOTHING)
+    street = models.ForeignKey(Street, on_delete=models.CASCADE)
     house_number = models.FloatField()
 
     class Meta:
