@@ -8,9 +8,6 @@
         v-model="route.route_name">
     <button class="btn btn-success">Submit</button>
   </form>
-  <!-- <my-dialog v-model:show="dialogVisible">
-          <label class="routeNames">A route with that name already exists!</label>
-  </my-dialog> -->
 
   <h1>Route list</h1>
 
@@ -18,20 +15,25 @@
          v-for="(route, index) in routes" :key="route.route_id"
          @dblclick="($data.route=route)">
       <div><strong>#{{ (index + 1) }}</strong></div>
-      <div class="routeNames">{{ route.route_name }} :- {{ route.route_id }} - {{ typeof (route.route_id)}}</div>
+      <div class="routeNames">{{ route.route_name }}</div>
 
       <div v-for="(routeComp, ind) in routesComps" :key="routeComp.route_comp_id">
         <div class="routeComponents" v-if="route.route_id == routeComp.route">
           <div><strong>#{{ (ind + 1) }}</strong></div>
-          <div>{{ routeComp.street_name }}, {{ routeComp.house_number}}: {{routeComp.follow_up_number }} :- {{ routeComp.route }} - {{typeof(routeComp.route)}} </div>
+          <div>{{ routeComp.street_name }}, {{ routeComp.house_number}}: {{routeComp.follow_up_number }} </div>
           <button
               class="btn btn-danger btn-sm mx-1"
               @click="deleteRoute(route)"
           >Remove
           </button>
         </div>
-      </div>
 
+      </div>
+      <button
+              class="btn btn-danger btn-sm mx-1"
+              @click="deleteRoute(route)"
+          >Remove
+          </button>
     </div>
 
 

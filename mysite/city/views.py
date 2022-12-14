@@ -26,7 +26,7 @@ class StreetView(viewsets.ModelViewSet):
 
 class HouseView(viewsets.ModelViewSet):
     serializer_class = HouseSerializer
-    queryset = House.objects.all()
+    queryset = House.objects.all().order_by('street')
 
 
     # def get_serializer_context(self):
@@ -36,9 +36,9 @@ class HouseView(viewsets.ModelViewSet):
 
 class RouteView(viewsets.ModelViewSet):
     serializer_class = RouteSerializer
-    queryset = Route.objects.all()
+    queryset = Route.objects.all().order_by('route_name')
 
 
 class RouteComponentsView(viewsets.ModelViewSet):
     serializer_class = RouteComponentsSerializer
-    queryset = RouteComponents.objects.all()
+    queryset = RouteComponents.objects.all().order_by('follow_up_number')

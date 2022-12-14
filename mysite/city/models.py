@@ -42,9 +42,9 @@ class Route(models.Model):
 
 class RouteComponents(models.Model):
     route_comp_id = models.AutoField(primary_key=True)
-    route = models.ForeignKey(Route, models.DO_NOTHING)
+    route = models.ForeignKey(Route, on_delete=models.CASCADE)
     follow_up_number = models.IntegerField()
-    house = models.ForeignKey(House, models.DO_NOTHING)
+    house = models.ForeignKey(House, on_delete=models.CASCADE)
 
     class Meta:
         managed = True

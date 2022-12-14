@@ -31,6 +31,7 @@ export default {
 }
 
 .btn {
+    margin-top: 15px;
     align-self: flex-end;
     margin-left: 15px;
     padding: 5px 10px;
