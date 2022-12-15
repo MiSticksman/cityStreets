@@ -32,17 +32,13 @@
       <button
               class="btn btn-danger btn-sm mx-1"
               @click="deleteRoute(route)"
-          >Remove
+          >Remove route
           </button>
     </div>
-
 
 </template>
 
 <script>
-const routesURL = "http://localhost:8000/routes";
-const routeCompsURL = "http://localhost:8000/routes_components";
-
 export default {
   props: {
     routes: {
@@ -79,7 +75,7 @@ export default {
       await this.getRoutes()
       console.log("create")
       console.log("route before", this.route.route_name)
-      await fetch(`${routesURL}/`, {
+      await fetch(`${this.$store.state.routesURL}/`, {
         method: 'post',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(this.route)
@@ -102,7 +98,7 @@ export default {
     async editRoute() {
       await this.getRoutes()
       console.log("edit")
-      await fetch(`${routesURL}/${this.route.route_id}/`, {
+      await fetch(`${this.$store.state.routesURL}/${this.route.route_id}/`, {
         method: 'put',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(this.route)
@@ -125,7 +121,7 @@ export default {
     async deleteRoute(route) {
       await this.getRoutes()
       console.log("remove")
-      await fetch(`${routesURL}/${route.route_id}/`, {
+      await fetch(`${this.$store.state.routesURL}/${route.route_id}/`, {
         method: 'delete',
         headers: {
           'Content-Type': 'application/json'
@@ -134,6 +130,67 @@ export default {
       });
       await this.getRoutes()
     },
+
+    async createRouteComp() {
+      await this.getRouteComps()
+      console.log("create")
+      console.log("route before", this.routeComp)
+      await fetch(`${this.$store.state.routeCompsURL}/`, {
+        method: 'post',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(this.route)
+      }).then(async response => {
+        const data = await response.json();
+        if (!response.ok) {
+          const error = (data && data.message) || response.status;
+          return Promise.reject(error);
+        }
+        this.postId = data.id;
+      })
+          .catch(error => {
+            this.showAlert("A route with that name already exists!")
+            console.error('There was an error!', error.$data);
+          });
+      this.route.route_name = ''
+      await this.getRouteComps()
+    },
+
+    async editRouteComp() {
+      await this.getRouteComps()
+      console.log("edit")
+      await fetch(`${this.$store.state.routeCompsURL}/${this.routeComp.route_comp_id}/`, {
+        method: 'put',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(this.route)
+      }).then(async response => {
+        const data = await response.json();
+        if (!response.ok) {
+          const error = (data && data.message) || response.status;
+          return Promise.reject(error);
+        }
+        this.postId = data.id;
+      })
+          .catch(error => {
+            this.showAlert("A route with that name already exists!")
+            console.error('There was an error!', error.$data);
+          });
+      await this.getRouteComps()
+      this.routeComp = {};
+    },
+
+    async deleteRouteComp(routeComp) {
+      await this.getRoutes()
+      console.log("remove")
+      await fetch(`${this.$store.state.routeCompsURL}/${routeComp.route_comp_id}/`, {
+        method: 'delete',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(this.routeComp)
+      });
+      await this.getRouteComps()
+    },
+
   }
 
 }
@@ -148,14 +205,15 @@ export default {
 
 .input {
   width: 100%;
-  border: 1px solid teal;
+  border: 2px solid teal;
   padding: 10px 10px;
   margin-top: 15px;
+  border-radius: 5px;
 }
 
 .route {
   padding: 15px;
-  border: 1px solid teal;
+  border: 3px solid teal;
   margin-top: 15px;
 }
 

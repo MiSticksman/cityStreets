@@ -10,8 +10,6 @@
 </template>
 
 <script>
-const routesUrl = "http://localhost:8000/routes";
-const routeCompsURL = "http://localhost:8000/routes_components";
 
 import RouteList from '@/components/route/RouteList.vue';
 export default {
@@ -34,11 +32,11 @@ export default {
             
         },
         async getRoutes() {
-            var response =  await fetch(`${routesUrl}/`)
+            var response =  await fetch(`${this.$store.state.routesURL}/`)
             this.routes =  await response.json();
         },
         async getRouteComps() {
-            var response =  await fetch(`${routeCompsURL}/`)
+            var response =  await fetch(`${this.$store.state.routeCompsURL}/`)
             this.routesComps =  await response.json();
         },
     }

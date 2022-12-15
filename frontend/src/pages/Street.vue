@@ -1,18 +1,16 @@
 <template>
     <div>
-        <street-list 
+        <street-list
             :streets="streets"
-            @submit="submitForm"
-            :getStreets="getStreets"/>
+            @deleteStreet="deleteStreet($event)"/>
     </div>
 </template>
 
 <script>
-const streetsURL = "http://localhost:8000/streets";
 import StreetList from "@/components/street/StreetList.vue";
 export default {
     components: {
-        StreetList
+        StreetList,
     },
     data() {
         return {
@@ -21,23 +19,33 @@ export default {
     },
 
     async created() {
-        await this.getStreets();
+        this.streets = await this.$store.getters.getStreets;
+        console.log('streets', this.streets)
     },
 
     methods: {
-        submitForm() {
-            
+        async submitForm(streets) {
+          this.streets = streets
         },
-        async getStreets() {
-            var response =  await fetch(`${streetsURL}/`)
-            this.streets =  await response.json();
-            // return this.streets
+
+        async deleteStreet(street) {
+            console.log("remove")
+            await fetch(`${this.$store.state.streetsURL}/${street.street_id}/`, {
+                method: 'delete',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(this.street)
+            });
+            await this.$store.getters.getStreets;
         },
+
+        // async getStreets() {
+        //     var response =  await fetch(`${this.$store.state.streetsURL}/`)
+        //     this.streets =  await response.json();
+        // },
     }
-    
 }
 </script>
-
 <style scoped>
-
 </style>

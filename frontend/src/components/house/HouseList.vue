@@ -18,14 +18,12 @@
         <button class="btn btn-success">Submit</button>     
     </form>
 
-    <!-- <my-dialog v-model:show="dialogVisible">
-            <label class="houseNames">A house with that street and number already exists!</label>
-    </my-dialog> -->
+
 
 
     <div v-for="(house, index) in houses"
         :key="house.house_id" class="house"
-        @dblclick="($data.house=house)"> 
+        @dblclick="($data.house=house)">
         <div><strong>#{{(index+1)}}</strong></div>
         <div class="houseParams">{{ house.street_name}}, {{house.house_number }}</div>
         <button 
@@ -37,8 +35,6 @@
 </template>
 
 <script>
-const housesURL = "http://localhost:8000/houses";
-const streetsURL = "http://localhost:8000/streets";
 export default {
     props: {
         houses: {
@@ -59,7 +55,7 @@ export default {
     },
     methods: {
         async getStreets() {
-            var response =  await fetch(`${streetsURL}/`)
+            var response =  await fetch(`${this.$store.state.streetsURL}/`)
             this.streets =  await response.json();
         },
         showAlert(error) {
@@ -76,7 +72,7 @@ export default {
         async createHouse() {
             await this.getHouses()
             console.log("create")
-            await fetch(`${housesURL}/`, {
+            await fetch(`${this.$store.state.housesURL}/`, {
                 method: 'post',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(this.house)
@@ -101,7 +97,7 @@ export default {
         async editHouse() {
             await this.getHouses()
             console.log("edit")
-            await fetch(`${housesURL}/${this.house.house_id}/`, {
+            await fetch(`${this.$store.state.housesURL}/${this.house.house_id}/`, {
                 method: 'put',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(this.house)
@@ -124,7 +120,7 @@ export default {
         async deleteHouse(house) {
             await this.getHouses()
             console.log("remove")
-            await fetch(`${housesURL}/${house.house_id}/`, {
+            await fetch(`${this.$store.state.housesURL}/${house.house_id}/`, {
                 method: 'delete',
                 headers: {
                     'Content-Type': 'application/json'
@@ -150,6 +146,7 @@ export default {
     padding: 10px 10px;
     margin-top: 15px;
     margin-left: 15px;
+    border-radius: 5px;
 }
 .house {
     padding: 15px;

@@ -8,7 +8,6 @@
 </template>
 
 <script>
-const housesURL = "http://localhost:8000/houses";
 import HouseList from '@/components/house/HouseList.vue';
 export default {
     components: {
@@ -29,7 +28,7 @@ export default {
             
         },
         async getHouses() {
-            var response =  await fetch(`${housesURL}/`)
+            var response =  await fetch(`${this.$store.state.housesURL}/`)
             this.houses =  await response.json();
         },
     }

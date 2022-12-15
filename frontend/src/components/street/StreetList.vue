@@ -9,10 +9,6 @@
     <button class="btn btn-success">Submit</button>
   </form>
 
-  <!-- <my-dialog v-model:show="dialogVisible">
-          <label class="streetNames">A street with that name already exists!</label>
-  </my-dialog> -->
-
   <h1>Street list</h1>
   <div class="street"
        v-for="(street, index) in streets" :key="street.street_id"
@@ -24,19 +20,17 @@
         @click="deleteStreet(street)"
     >Remove
     </button>
-
   </div>
 
 </template>
 
 <script>
-const streetsURL = "http://localhost:8000/streets";
+
 export default {
   props: {
     streets: {
       required: true
     },
-    getStreets: {type: Function},
   },
   data() {
     return {
@@ -48,25 +42,27 @@ export default {
     showAlert(error) {
       this.$swal(error);
     },
-    submitForm() {
-      this.$emit('submit')
+    async submitForm() {
       if (this.street.street_id === undefined) {
         this.createStreet();
       } else {
         this.editStreet();
       }
     },
+
     async createStreet() {
-      await this.getStreets()
       console.log("create")
       console.log("street before", this.street.street_name)
-      await fetch(`${streetsURL}/`, {
+      await fetch(`${this.$store.state.streetsURL}/`, {
         method: 'post',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(this.street)
       }).then(async response => {
         const data = await response.json();
-        if (!response.ok) {
+        if (response.ok) {
+          this.$emit('submitForm', await this.$store.getters.getStreets)
+          location.reload()
+        } else {
           const error = (data && data.message) || response.status;
           return Promise.reject(error);
         }
@@ -76,20 +72,21 @@ export default {
             this.showAlert("A street with that name already exists!")
             console.error('There was an error!', error.$data);
           });
-      this.street.street_name = ''
-      await this.getStreets()
+          this.street.street_name = ''
     },
 
     async editStreet() {
-      await this.getStreets()
       console.log("edit")
-      await fetch(`${streetsURL}/${this.street.street_id}/`, {
+      await fetch(`${this.$store.state.streetsURL}/${this.street.street_id}/`, {
         method: 'put',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(this.street)
       }).then(async response => {
         const data = await response.json();
-        if (!response.ok) {
+        if (response.ok) {
+          this.$emit('submitForm', await this.$store.getters.getStreets)
+          location.reload()
+        } else {
           const error = (data && data.message) || response.status;
           return Promise.reject(error);
         }
@@ -99,22 +96,13 @@ export default {
             this.showAlert("A street with that name already exists!")
             console.error('There was an error!', error.$data);
           });
-      await this.getStreets()
       this.street = {};
     },
-
+    
     async deleteStreet(street) {
-      await this.getStreets()
-      console.log("remove")
-      await fetch(`${streetsURL}/${street.street_id}/`, {
-        method: 'delete',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(this.street)
-      });
-      await this.getStreets()
+      this.$emit('deleteStreet', street)
     },
+
   }
 }
 </script>
@@ -131,6 +119,7 @@ export default {
   border: 1px solid teal;
   padding: 10px 10px;
   margin-top: 15px;
+  border-radius: 5px;
 }
 
 .street {
