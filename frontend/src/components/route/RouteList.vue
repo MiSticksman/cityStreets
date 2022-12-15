@@ -2,6 +2,7 @@
 
   <form class="routeForm" @submit.prevent="submitForm">
     <input
+        ref="inputRoute"
         type="text"
         class="input"
         placeholder="Route name"
@@ -12,12 +13,12 @@
   <h1>Route list</h1>
 
     <div class="route"
-         v-for="(route, index) in routes" :key="route.route_id"
-         @dblclick="($data.route=route)">
+         v-for="(route, index) in this.$store.state.routes" :key="route.route_id"
+         @dblclick="($data.route=route), this.$refs.inputRoute.focus()">
       <div><strong>#{{ (index + 1) }}</strong></div>
       <div class="routeNames">{{ route.route_name }}</div>
 
-      <div v-for="(routeComp, ind) in routesComps" :key="routeComp.route_comp_id">
+      <div v-for="(routeComp, ind) in this.$store.state.routesComps" :key="routeComp.route_comp_id">
         <div class="routeComponents" v-if="route.route_id == routeComp.route">
           <div><strong>#{{ (ind + 1) }}</strong></div>
           <div>{{ routeComp.street_name }}, {{ routeComp.house_number}}: {{routeComp.follow_up_number }} </div>
@@ -25,6 +26,11 @@
               class="btn btn-danger btn-sm mx-1"
               @click="deleteRoute(route)"
           >Remove
+          </button>
+          <button
+              class="btn btn-success"
+              @click="editRoute()"
+          >Edit
           </button>
         </div>
 
@@ -40,16 +46,6 @@
 
 <script>
 export default {
-  props: {
-    routes: {
-      required: true
-    },
-    routesComps: {
-      required: true
-    },
-    getRoutes: {type: Function},
-    getRouteComps: {type: Function},
-  },
 
   data() {
     return {
@@ -72,7 +68,6 @@ export default {
     },
 
     async createRoute() {
-      await this.getRoutes()
       console.log("create")
       console.log("route before", this.route.route_name)
       await fetch(`${this.$store.state.routesURL}/`, {
@@ -81,7 +76,9 @@ export default {
         body: JSON.stringify(this.route)
       }).then(async response => {
         const data = await response.json();
-        if (!response.ok) {
+        if (response.ok) {
+          location.reload()
+        } else {
           const error = (data && data.message) || response.status;
           return Promise.reject(error);
         }
@@ -92,11 +89,9 @@ export default {
             console.error('There was an error!', error.$data);
           });
       this.route.route_name = ''
-      await this.getRoutes()
     },
 
     async editRoute() {
-      await this.getRoutes()
       console.log("edit")
       await fetch(`${this.$store.state.routesURL}/${this.route.route_id}/`, {
         method: 'put',
@@ -104,7 +99,9 @@ export default {
         body: JSON.stringify(this.route)
       }).then(async response => {
         const data = await response.json();
-        if (!response.ok) {
+        if (response.ok) {
+          location.reload()
+        } else {
           const error = (data && data.message) || response.status;
           return Promise.reject(error);
         }
@@ -114,25 +111,14 @@ export default {
             this.showAlert("A route with that name already exists!")
             console.error('There was an error!', error.$data);
           });
-      await this.getRoutes()
       this.route = {};
     },
 
     async deleteRoute(route) {
-      await this.getRoutes()
-      console.log("remove")
-      await fetch(`${this.$store.state.routesURL}/${route.route_id}/`, {
-        method: 'delete',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(this.route)
-      });
-      await this.getRoutes()
+      this.$emit('deleteRoute', route)
     },
 
     async createRouteComp() {
-      await this.getRouteComps()
       console.log("create")
       console.log("route before", this.routeComp)
       await fetch(`${this.$store.state.routeCompsURL}/`, {
@@ -141,7 +127,9 @@ export default {
         body: JSON.stringify(this.route)
       }).then(async response => {
         const data = await response.json();
-        if (!response.ok) {
+        if (response.ok) {
+          location.reload()
+        } else {
           const error = (data && data.message) || response.status;
           return Promise.reject(error);
         }
@@ -152,7 +140,6 @@ export default {
             console.error('There was an error!', error.$data);
           });
       this.route.route_name = ''
-      await this.getRouteComps()
     },
 
     async editRouteComp() {
@@ -164,7 +151,9 @@ export default {
         body: JSON.stringify(this.route)
       }).then(async response => {
         const data = await response.json();
-        if (!response.ok) {
+        if (response.ok) {
+          location.reload()
+        } else {
           const error = (data && data.message) || response.status;
           return Promise.reject(error);
         }
@@ -174,25 +163,14 @@ export default {
             this.showAlert("A route with that name already exists!")
             console.error('There was an error!', error.$data);
           });
-      await this.getRouteComps()
       this.routeComp = {};
     },
 
-    async deleteRouteComp(routeComp) {
-      await this.getRoutes()
-      console.log("remove")
-      await fetch(`${this.$store.state.routeCompsURL}/${routeComp.route_comp_id}/`, {
-        method: 'delete',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(this.routeComp)
-      });
-      await this.getRouteComps()
+    async deleteRouteComp(routeComps) {
+      this.$emit('deleteRoutComps', routeComps)
     },
 
   }
-
 }
 </script>
 

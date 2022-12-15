@@ -2,6 +2,7 @@
 
   <form class="streetForm" @submit.prevent="submitForm">
     <input
+        ref="input"
         type="text"
         class="input"
         placeholder="Street name"
@@ -11,8 +12,8 @@
 
   <h1>Street list</h1>
   <div class="street"
-       v-for="(street, index) in streets" :key="street.street_id"
-       @dblclick="($data.street=street)">
+       v-for="(street, index) in this.$store.state.streets" :key="street.street_id"
+       @dblclick="$data.street=street, this.$refs.input.focus();">
     <div><strong>#{{ (index + 1) }}</strong></div>
     <div class="streetNames">{{ street.street_name }}</div>
     <button
@@ -27,11 +28,11 @@
 <script>
 
 export default {
-  props: {
-    streets: {
-      required: true
-    },
-  },
+  // props: {
+  //   streets: {
+  //     required: true
+  //   },
+  // },
   data() {
     return {
       street: {},
@@ -42,6 +43,7 @@ export default {
     showAlert(error) {
       this.$swal(error);
     },
+
     async submitForm() {
       if (this.street.street_id === undefined) {
         this.createStreet();
@@ -102,6 +104,8 @@ export default {
     async deleteStreet(street) {
       this.$emit('deleteStreet', street)
     },
+
+    
 
   }
 }

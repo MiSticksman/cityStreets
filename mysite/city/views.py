@@ -26,7 +26,7 @@ class StreetView(viewsets.ModelViewSet):
 
 class HouseView(viewsets.ModelViewSet):
     serializer_class = HouseSerializer
-    queryset = House.objects.all().order_by('street')
+    queryset = House.objects.all().order_by('house_number')
 
 
     # def get_serializer_context(self):

@@ -1,9 +1,8 @@
 <template>
     <div>
         <house-list 
-            :houses="houses"
-            @submit="submitForm"
-            :getHouses="getHouses"/>
+            @submitForm="submitForm"
+            @deleteHouse="deleteHouse($event)"/>
     </div>
 </template>
 
@@ -13,23 +12,27 @@ export default {
     components: {
         HouseList
     },
-    data() {
-        return {
-            houses: []
-        }
-    },
 
     async created() {
-        await this.getHouses();
+        this.$store.getters.getHouses
+        this.$store.getters.getStreets
     },
 
     methods: {
-        submitForm() {
-            
+        submitForm(houses) {
+            this.houses = houses
         },
-        async getHouses() {
-            var response =  await fetch(`${this.$store.state.housesURL}/`)
-            this.houses =  await response.json();
+        async deleteHouse(house) {
+            console.log("remove")
+            await fetch(`${this.$store.state.housesURL}/${house.house_id}/`, {
+                method: 'delete',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(this.house)
+            });
+            await this.$store.getters.getHouses
+            location.reload() 
         },
     }
 }

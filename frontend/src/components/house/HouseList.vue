@@ -3,13 +3,14 @@
     <form class="houseForm" @submit.prevent="submitForm">
         <select v-model="house.street">
             <option 
-                v-for="street in streets"
+                v-for="street in this.$store.state.streets"
                 v-bind:key="street.street_id"
                 v-bind:value="street.street_id">
                 {{ street.street_name }}
             </option>
         </select>
-        <input 
+        <input
+            ref="input" 
             v-model="house.house_number"
             class="input"
             min="1"
@@ -18,12 +19,9 @@
         <button class="btn btn-success">Submit</button>     
     </form>
 
-
-
-
-    <div v-for="(house, index) in houses"
+    <div v-for="(house, index) in this.$store.state.houses"
         :key="house.house_id" class="house"
-        @dblclick="($data.house=house)">
+        @dblclick="($data.house=house), this.$refs.input.focus();">
         <div><strong>#{{(index+1)}}</strong></div>
         <div class="houseParams">{{ house.street_name}}, {{house.house_number }}</div>
         <button 
@@ -40,7 +38,6 @@ export default {
         houses: {
             required: true
         },
-        getHouses: { type: Function },
     },
     data() {
         return {
@@ -50,14 +47,11 @@ export default {
         }
         
     },
-    async created() {
-        await this.getStreets();
-    },
     methods: {
-        async getStreets() {
-            var response =  await fetch(`${this.$store.state.streetsURL}/`)
-            this.streets =  await response.json();
-        },
+        // async getStreets() {
+        //     var response =  await fetch(`${this.$store.state.streetsURL}/`)
+        //     this.streets =  await response.json();
+        // },
         showAlert(error) {
             this.$swal(error);
         },
@@ -70,7 +64,6 @@ export default {
             }
         },
         async createHouse() {
-            await this.getHouses()
             console.log("create")
             await fetch(`${this.$store.state.housesURL}/`, {
                 method: 'post',
@@ -78,7 +71,10 @@ export default {
                 body: JSON.stringify(this.house)
             }).then(async response => {
             const data = await response.json();
-            if (!response.ok) {
+            if (response.ok) {
+                this.$emit('sumbitForm', this.$store.getters.getHouses)
+                location.reload()
+            } else {
             const error = (data && data.message) || response.status;
             return Promise.reject(error);
             } 
@@ -91,11 +87,9 @@ export default {
             console.log("house:", this.house)
             // this.house.street.street_name = ''
             this.house.house_number = ''
-            await this.getHouses()
         },
 
         async editHouse() {
-            await this.getHouses()
             console.log("edit")
             await fetch(`${this.$store.state.housesURL}/${this.house.house_id}/`, {
                 method: 'put',
@@ -103,7 +97,10 @@ export default {
                 body: JSON.stringify(this.house)
             }).then(async response => {
             const data = await response.json();
-            if (!response.ok) {
+            if (response.ok) {
+                this.$emit('sumbitForm', this.$store.getters.getHouses)
+                location.reload()
+            } else{
             const error = (data && data.message) || response.status;
             return Promise.reject(error);
             } 
@@ -113,21 +110,11 @@ export default {
             this.showAlert("A house with that street and number already exists!")
             console.error('There was an error!', error.$data);
             }); 
-            await this.getHouses()
             this.house = {};
         },
     
         async deleteHouse(house) {
-            await this.getHouses()
-            console.log("remove")
-            await fetch(`${this.$store.state.housesURL}/${house.house_id}/`, {
-                method: 'delete',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(this.house)
-            });
-            await this.getHouses()
+            this.$emit('deleteHouse', house)
         }
     }  
 }

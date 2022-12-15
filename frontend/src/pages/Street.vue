@@ -1,7 +1,7 @@
 <template>
     <div>
         <street-list
-            :streets="streets"
+            @submitForm="submitForm($event)"
             @deleteStreet="deleteStreet($event)"/>
     </div>
 </template>
@@ -12,15 +12,9 @@ export default {
     components: {
         StreetList,
     },
-    data() {
-        return {
-            streets: []
-        }
-    },
-
+    
     async created() {
-        this.streets = await this.$store.getters.getStreets;
-        console.log('streets', this.streets)
+        this.$store.getters.getStreets
     },
 
     methods: {
@@ -38,12 +32,9 @@ export default {
                 body: JSON.stringify(this.street)
             });
             await this.$store.getters.getStreets;
+            location.reload() 
         },
-
-        // async getStreets() {
-        //     var response =  await fetch(`${this.$store.state.streetsURL}/`)
-        //     this.streets =  await response.json();
-        // },
+        
     }
 }
 </script>
