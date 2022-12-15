@@ -7,6 +7,8 @@ import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 import swal from 'sweetalert2';
 window.Swal = swal;
+import store from "@/store";
+
 
 const app = createApp(App)
 
@@ -20,4 +22,5 @@ urls.forEach(url => {
 
 app.use(router)
 app.use(VueSweetalert2);
+app.use(store)
 app.mount('#app')

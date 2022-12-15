@@ -24,7 +24,6 @@ export default {
             routesComps: [],
         }
     },
-
     async created() {
         await this.getRoutes();
         await this.getRouteComps();

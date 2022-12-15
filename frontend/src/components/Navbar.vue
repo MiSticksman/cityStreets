@@ -17,7 +17,7 @@ export default {
 
 <style scoped>
 .navbar {
-  height: 50px;
+  height: 70px;
   background-color: lightgray;
   box-shadow: 2px 2px 4px gray;
   display: flex;
