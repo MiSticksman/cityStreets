@@ -15,7 +15,8 @@
             class="input"
             min="1"
             placeholder="House number"
-            type="number">
+            type="number"
+            step="0.5">
         <button class="btn btn-success">Submit</button>     
     </form>
 
@@ -48,10 +49,6 @@ export default {
         
     },
     methods: {
-        // async getStreets() {
-        //     var response =  await fetch(`${this.$store.state.streetsURL}/`)
-        //     this.streets =  await response.json();
-        // },
         showAlert(error) {
             this.$swal(error);
         },
@@ -73,7 +70,7 @@ export default {
             const data = await response.json();
             if (response.ok) {
                 this.$emit('sumbitForm', this.$store.getters.getHouses)
-                location.reload()
+                // location.reload()
             } else {
             const error = (data && data.message) || response.status;
             return Promise.reject(error);
@@ -86,7 +83,7 @@ export default {
             }); 
             console.log("house:", this.house)
             // this.house.street.street_name = ''
-            this.house.house_number = ''
+            this.house = ''
         },
 
         async editHouse() {

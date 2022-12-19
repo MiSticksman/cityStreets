@@ -98,6 +98,7 @@ export default {
             this.showAlert("A street with that name already exists!")
             console.error('There was an error!', error.$data);
           });
+
       this.street = {};
     },
     

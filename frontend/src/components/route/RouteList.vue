@@ -1,177 +1,266 @@
 <template>
-
-  <form class="routeForm" @submit.prevent="submitForm">
+  <form class="routeForm" @submit.prevent="submitRouteForm">
     <input
-        ref="inputRoute"
-        type="text"
-        class="input"
-        placeholder="Route name"
-        v-model="route.route_name">
+      ref="inputRoute"
+      type="text"
+      class="input"
+      placeholder="Route name"
+      v-model="route.route_name"
+    />
     <button class="btn btn-success">Submit</button>
   </form>
 
+  
+  <my-dialog v-model:show="dialogVisible">
+    <form class="routeCompsForm" @submit.prevent="submitRouteCompForm">
+      <select v-model="routeComp.route">
+        <option
+          v-for="route in this.$store.state.routes"
+          v-bind:key="route.route_id"
+          v-bind:value="route.route_id">
+          {{ route.route_name }}
+        </option>
+      </select>
+      <select v-model="routeComp.house">
+        <option
+          v-for="house in this.$store.state.houses"
+          v-bind:key="house.house_id"
+          v-bind:value="house.house_id">
+          {{ house.street_name }}, {{ house.house_number }}
+        </option>
+      </select>
+      <input
+        v-model="routeComp.follow_up_number"
+        class="input"
+        min="1"
+        placeholder="follow up number"
+        type="number"
+      />
+      <button class="btn btn-success">Ok</button>
+    </form>
+  </my-dialog>
+
+  <!-- <my-dialog v-model:show="dialogVisible">
+    <form class="routeCompsForm" @submit.prevent="editRouteComp">
+      <select v-model="routeComp.house">
+        <option
+          v-for="house in this.$store.state.houses"
+          v-bind:key="house.house_id"
+          v-bind:value="house.house_id">
+          {{ house.street_name }}, {{ house.house_number }}
+        </option>
+      </select>
+      <input
+        v-model="routeComp.follow_up_number"
+        class="input"
+        min="1"
+        placeholder="follow up number"
+        type="number"
+      />
+      <button class="btn btn-success">Ok</button>
+    </form>
+  </my-dialog> -->
+
   <h1>Route list</h1>
 
-    <div class="route"
-         v-for="(route, index) in this.$store.state.routes" :key="route.route_id"
-         @dblclick="($data.route=route), this.$refs.inputRoute.focus()">
-      <div><strong>#{{ (index + 1) }}</strong></div>
-      <div class="routeNames">{{ route.route_name }}</div>
+  <button class="btn btn-success" @click="routeCompCreateFormVisible(route)">
+      Add route component
+    </button>
 
-      <div v-for="(routeComp, ind) in this.$store.state.routesComps" :key="routeComp.route_comp_id">
-        <div class="routeComponents" v-if="route.route_id == routeComp.route">
-          <div><strong>#{{ (ind + 1) }}</strong></div>
-          <div>{{ routeComp.street_name }}, {{ routeComp.house_number}}: {{routeComp.follow_up_number }} </div>
-          <button
-              class="btn btn-danger btn-sm mx-1"
-              @click="deleteRoute(route)"
-          >Remove
-          </button>
-          <button
-              class="btn btn-success"
-              @click="editRoute()"
-          >Edit
-          </button>
-        </div>
-
-      </div>
-      <button
-              class="btn btn-danger btn-sm mx-1"
-              @click="deleteRoute(route)"
-          >Remove route
-          </button>
+  <div
+    class="route"
+    v-for="(route, index) in this.$store.state.routes"
+    :key="route.route_id"
+    @dblclick="($data.route = route), this.$refs.inputRoute.focus()"
+  >
+    <div>
+      <strong>#{{ index + 1 }}</strong>
     </div>
+    <div class="routeNames">{{ route.route_name }}</div>
+    
 
+    <div
+      v-for="(routeComp, ind) in this.$store.state.routesComps"
+      :key="routeComp.route_comp_id">
+      <div class="routeComponents" v-if="route.route_id == routeComp.route">
+        <div>
+          <strong>#{{ ind + 1 }}</strong>
+        </div>
+        <div>
+          <div class="routeCompNames">
+            {{ routeComp.street_name }}, 
+            {{ routeComp.house_number }}:
+            {{ routeComp.follow_up_number }}
+          </div>
+        </div>
+        <button class="btn btn-danger btn-sm mx-1" @click="deleteRoute(route)">
+          Remove
+        </button>
+        <button
+          class="btn btn-success"
+          @click="routeCompEditFormVisible(routeComp, route)">
+          Edit
+        </button>
+      </div>
+    </div>
+    <button class="btn btn-danger btn-sm mx-1" @click="deleteRoute(route)">
+      Remove route
+    </button>
+  </div>
 </template>
 
 <script>
 export default {
-
   data() {
     return {
       route: {},
       routeComp: {},
       dialogVisible: false,
-    }
+    };
   },
   methods: {
     showAlert(error) {
       this.$swal(error);
     },
-    submitForm() {
-      this.$emit('submit')
-        if (this.route.route_id === undefined) {
-          this.createRoute();
-        } else {
-          this.editRoute();
-        }
+    submitRouteForm() {
+      this.$emit("submit");
+      if (this.route.route_id === undefined) {
+        this.createRoute();
+      } else {
+        this.editRoute();
+      }
     },
 
     async createRoute() {
-      console.log("create")
-      console.log("route before", this.route.route_name)
+      console.log("create");
+      console.log("route before", this.route.route_name);
       await fetch(`${this.$store.state.routesURL}/`, {
-        method: 'post',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(this.route)
-      }).then(async response => {
-        const data = await response.json();
-        if (response.ok) {
-          location.reload()
-        } else {
-          const error = (data && data.message) || response.status;
-          return Promise.reject(error);
-        }
-        this.postId = data.id;
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(this.route),
       })
-          .catch(error => {
-            this.showAlert("A route with that name already exists!")
-            console.error('There was an error!', error.$data);
-          });
-      this.route.route_name = ''
+        .then(async (response) => {
+          const data = await response.json();
+          if (response.ok) {
+            location.reload();
+          } else {
+            const error = (data && data.message) || response.status;
+            return Promise.reject(error);
+          }
+          this.postId = data.id;
+        })
+        .catch((error) => {
+          this.showAlert("A route with that name already exists!");
+          console.error("There was an error!", error.$data);
+        });
+      this.route = {};
     },
 
     async editRoute() {
-      console.log("edit")
+      console.log("edit");
       await fetch(`${this.$store.state.routesURL}/${this.route.route_id}/`, {
-        method: 'put',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(this.route)
-      }).then(async response => {
-        const data = await response.json();
-        if (response.ok) {
-          location.reload()
-        } else {
-          const error = (data && data.message) || response.status;
-          return Promise.reject(error);
-        }
-        this.postId = data.id;
+        method: "put",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(this.route),
       })
-          .catch(error => {
-            this.showAlert("A route with that name already exists!")
-            console.error('There was an error!', error.$data);
-          });
+        .then(async (response) => {
+          const data = await response.json();
+          if (response.ok) {
+            location.reload();
+          } else {
+            const error = (data && data.message) || response.status;
+            return Promise.reject(error);
+          }
+          this.postId = data.id;
+        })
+        .catch((error) => {
+          this.showAlert("A route with that name already exists!");
+          console.error("There was an error!", error.$data);
+        });
       this.route = {};
     },
 
     async deleteRoute(route) {
-      this.$emit('deleteRoute', route)
+      this.$emit("deleteRoute", route);
+    },
+
+    submitRouteCompForm() {
+      // this.$emit("submit");
+      if (this.routeComp.route_comp_id === undefined) {
+        this.createRouteComp();
+      } else {
+        this.editRouteComp();
+        console.log("edit end")
+      }
     },
 
     async createRouteComp() {
-      console.log("create")
-      console.log("route before", this.routeComp)
+      console.log("create RouteComp");
+      console.log("routeComp before", this.routeComp);
       await fetch(`${this.$store.state.routeCompsURL}/`, {
-        method: 'post',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(this.route)
-      }).then(async response => {
-        const data = await response.json();
-        if (response.ok) {
-          location.reload()
-        } else {
-          const error = (data && data.message) || response.status;
-          return Promise.reject(error);
-        }
-        this.postId = data.id;
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(this.routeComp),
       })
-          .catch(error => {
-            this.showAlert("A route with that name already exists!")
-            console.error('There was an error!', error.$data);
-          });
-      this.route.route_name = ''
+        .then(async (response) => {
+          const data = await response.json();
+          if (response.ok) {
+            location.reload();
+          } else {
+            const error = (data && data.message) || response.status;
+            return Promise.reject(error);
+          }
+          this.postId = data.id;
+        })
+        .catch((error) => {
+          this.showAlert("A route with that name already exists!");
+          console.error("There was an error!", error.$data);
+        });
+      this.routeComp = {};
     },
 
     async editRouteComp() {
-      await this.getRouteComps()
-      console.log("edit")
-      await fetch(`${this.$store.state.routeCompsURL}/${this.routeComp.route_comp_id}/`, {
-        method: 'put',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(this.route)
-      }).then(async response => {
-        const data = await response.json();
-        if (response.ok) {
-          location.reload()
-        } else {
-          const error = (data && data.message) || response.status;
-          return Promise.reject(error);
+      console.log("edit");
+      await fetch(
+        `${this.$store.state.routeCompsURL}/${this.routeComp.route_comp_id}/`,
+        {
+          method: "put",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(this.routeComp),
         }
-        this.postId = data.id;
-      })
-          .catch(error => {
-            this.showAlert("A route with that name already exists!")
-            console.error('There was an error!', error.$data);
-          });
+      )
+        .then(async (response) => {
+          const data = await response.json();
+          if (response.ok) {
+            location.reload();
+          } else {
+            const error = (data && data.message) || response.status;
+            return Promise.reject(error);
+          }
+          this.postId = data.id;
+        })
+        .catch((error) => {
+          this.showAlert("A route with that name already exists!");
+          console.error("There was an error!", error.$data);
+        });
       this.routeComp = {};
     },
 
     async deleteRouteComp(routeComps) {
-      this.$emit('deleteRoutComps', routeComps)
+      this.$emit("deleteRoutComps", routeComps);
     },
 
-  }
-}
+    async routeCompCreateFormVisible() {
+      this.dialogVisible = true;
+    },
+
+    async routeCompEditFormVisible(routeComp) {
+      console.log("Edit rC", routeComp);
+      this.$data.routeComp = await routeComp;
+      this.dialogVisible = true;
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -196,12 +285,19 @@ export default {
 }
 
 .routeNames {
-  font-size: 20px;
+  font-size: 25px;
 }
 
-.routeComponents{
+.routeComponents {
   padding: 15px;
   border: 1px solid teal;
   margin-top: 15px;
 }
+
+.routeCompNames {
+  font-size: 20px;
+  /* color: rebeccapurple */
+}
+
+
 </style>
