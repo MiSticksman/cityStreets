@@ -1,7 +1,7 @@
 <template>
     <div>
+        <!-- @submitForm="submitForm($event)" -->
         <street-list
-            @submitForm="submitForm($event)"
             @deleteStreet="deleteStreet($event)"/>
     </div>
 </template>
@@ -13,14 +13,14 @@ export default {
         StreetList,
     },
     
-    async created() {
-        this.$store.getters.getStreets
-    },
+    // async created() {
+    //     this.$store.getters.getStreets
+    // },
 
     methods: {
-        async submitForm(streets) {
-          this.streets = streets
-        },
+        // async submitForm(streets) {
+        //   this.streets = streets
+        // },
 
         async deleteStreet(street) {
             console.log("remove")

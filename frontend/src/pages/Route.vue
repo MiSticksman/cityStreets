@@ -1,8 +1,8 @@
 <template>
   <div>
+    <!-- @submitRoute="submitRoute($event)"
+      @submitRouteComps="submitRouteComps($event)" -->
     <route-list
-      @submitRoute="submitRoute($event)"
-      @submitRouteComps="submitRouteComps($event)"
       @deleteRoute="deleteRoute($event)"
       @deleteRouteComps="deleteRouteComps($event)"
     />
@@ -19,23 +19,24 @@ export default {
     return {
       routes: [],
       routesComps: [],
+      
     };
   },
-  async created() {
-    await this.$store.getters.getStreets;
-    await this.$store.getters.getHouses;
-    await this.$store.getters.getRoutes;
-    await this.$store.getters.getRouteComps;
-  },
+  // async created() {
+  //   await this.$store.getters.getStreets;
+  //   await this.$store.getters.getHouses;
+  //   await this.$store.getters.getRoutes;
+  //   await this.$store.getters.getRouteComps;
+  // },
 
   methods: {
-    submitRoute(routes) {
-      this.routes = routes;
-    },
+    // submitRoute(routes) {
+    //   this.routes = routes;
+    // },
 
-    submitRouteComps(routesComps) {
-      this.routesComps = routesComps;
-    },
+    // submitRouteComps(routesComps) {
+    //   this.routesComps = routesComps;
+    // },
 
     async deleteRoute(route) {
       console.log("remove");

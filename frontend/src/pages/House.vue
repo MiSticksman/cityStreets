@@ -1,7 +1,7 @@
 <template>
     <div>
+        <!-- @submitForm="submitForm" -->
         <house-list 
-            @submitForm="submitForm"
             @deleteHouse="deleteHouse($event)"/>
     </div>
 </template>
@@ -13,15 +13,15 @@ export default {
         HouseList
     },
 
-    async created() {
-        this.$store.getters.getHouses
-        this.$store.getters.getStreets
-    },
+    // async created() {
+    //     this.$store.getters.getHouses
+    //     this.$store.getters.getStreets
+    // },
 
     methods: {
-        submitForm(houses) {
-            this.houses = houses
-        },
+        // submitForm(houses) {
+        //     this.houses = houses
+        // },
         async deleteHouse(house) {
             console.log("remove")
             await fetch(`${this.$store.state.housesURL}/${house.house_id}/`, {

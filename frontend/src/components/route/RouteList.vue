@@ -1,7 +1,7 @@
 <template>
   <form class="routeForm" @submit.prevent="submitRouteForm">
     <input
-      ref="inputRoute"
+      ref="input"
       type="text"
       class="input"
       placeholder="Route name"
@@ -10,22 +10,23 @@
     <button class="btn btn-success">Submit</button>
   </form>
 
-  
   <my-dialog v-model:show="dialogVisible">
     <form class="routeCompsForm" @submit.prevent="submitRouteCompForm">
       <select v-model="routeComp.route">
         <option
-          v-for="route in this.$store.state.routes"
+          v-for="route in this.allRoutes"
           v-bind:key="route.route_id"
-          v-bind:value="route.route_id">
+          v-bind:value="route.route_id"
+        >
           {{ route.route_name }}
         </option>
       </select>
       <select v-model="routeComp.house">
         <option
-          v-for="house in this.$store.state.houses"
+          v-for="house in this.houses"
           v-bind:key="house.house_id"
-          v-bind:value="house.house_id">
+          v-bind:value="house.house_id"
+        >
           {{ house.street_name }}, {{ house.house_number }}
         </option>
       </select>
@@ -40,90 +41,130 @@
     </form>
   </my-dialog>
 
-  <!-- <my-dialog v-model:show="dialogVisible">
-    <form class="routeCompsForm" @submit.prevent="editRouteComp">
-      <select v-model="routeComp.house">
-        <option
-          v-for="house in this.$store.state.houses"
-          v-bind:key="house.house_id"
-          v-bind:value="house.house_id">
-          {{ house.street_name }}, {{ house.house_number }}
-        </option>
-      </select>
-      <input
-        v-model="routeComp.follow_up_number"
-        class="input"
-        min="1"
-        placeholder="follow up number"
-        type="number"
-      />
-      <button class="btn btn-success">Ok</button>
-    </form>
-  </my-dialog> -->
-
-  <h1>Route list</h1>
-
   <button class="btn btn-success" @click="routeCompCreateFormVisible(route)">
-      Add route component
-    </button>
+    Add route component
+  </button>
 
-  <div
-    class="route"
-    v-for="(route, index) in this.$store.state.routes"
-    :key="route.route_id"
-    @dblclick="($data.route = route), this.$refs.inputRoute.focus()"
-  >
-    <div>
-      <strong>#{{ index + 1 }}</strong>
-    </div>
-    <div class="routeNames">{{ route.route_name }}</div>
+  <div v-if="this.curRoutes.length > 0">
+    <h1>Route list</h1>
     
-
     <div
-      v-for="(routeComp, ind) in this.$store.state.routesComps"
-      :key="routeComp.route_comp_id">
-      <div class="routeComponents" v-if="route.route_id == routeComp.route">
-        <div>
-          <strong>#{{ ind + 1 }}</strong>
-        </div>
-        <div>
-          <div class="routeCompNames">
-            {{ routeComp.street_name }}, 
-            {{ routeComp.house_number }}:
-            {{ routeComp.follow_up_number }}
-          </div>
-        </div>
-        <button class="btn btn-danger btn-sm mx-1" @click="deleteRoute(route)">
-          Remove
-        </button>
-        <button
-          class="btn btn-success"
-          @click="routeCompEditFormVisible(routeComp, route)">
-          Edit
-        </button>
+      class="route"
+      v-for="(route, index) in this.curRoutes"
+      :key="route.route_id"
+      @dblclick="($data.route = route), this.$refs.inputRoute.focus()"
+    >
+      <div>
+        <strong>#{{ index + 1 }}</strong>
       </div>
+      <div class="routeNames">{{ route.route_name }}</div>
+
+      <div
+        v-for="routeComp in this.routesComps"
+        :key="routeComp.route_comp_id"
+      >
+        <div class="routeComponents" v-if="route.route_id == routeComp.route">
+          <div>
+            <strong> {{ routeComp.follow_up_number }}</strong>
+          </div>
+          <div>
+            <div class="routeCompNames">
+              {{ routeComp.street_name }}, {{ routeComp.house_number }}:
+              {{ routeComp.follow_up_number }}
+            </div>
+          </div>
+
+          <button
+            class="btn btn-danger btn-sm mx-1"
+            @click="deleteRoute(route)"
+          >
+            Remove
+          </button>
+          <button
+            class="btn btn-success"
+            @click="routeCompEditFormVisible(routeComp, route)"
+          >
+            Edit
+          </button>
+        </div>
+      </div>
+
+      <button class="btn btn-danger btn-sm mx-1" @click="deleteRoute(route)">
+        Remove route
+      </button>
     </div>
-    <button class="btn btn-danger btn-sm mx-1" @click="deleteRoute(route)">
-      Remove route
-    </button>
+    <Pagination
+      :total="total"
+      :limit="curRoutes.length"
+      @page-changed="loadRoutes"
+    />
+  </div>
+  <div v-else>
+    <h2 style="color: red">List is empty</h2>
   </div>
 </template>
 
 <script>
+import Pagination from '@/components/Pagination.vue'
 export default {
+  components: {
+    Pagination
+  },
   data() {
     return {
       route: {},
       routeComp: {},
+      curRoutes: [],
+      allRoutes: [],
+      houses: [],
+      routesComps: [],
+      page: 1,
+      total: 0,
       dialogVisible: false,
     };
   },
+  created() {
+    this.loadRoutes(this.page);
+    this.loadAllHouses();
+    this.loadAllRoutes();
+    this.loadAllRoutesComps();
+  },
   methods: {
+    async loadRoutes(pageNumber) {
+      this.curRoutes = await fetch(
+        `${this.$store.getters.getRoutesURL}/?page=${pageNumber}`
+      )
+        .then((response) => response.json())
+        .then((response) => {
+          this.total = response.count;
+          return response.results;
+        });
+        this.$refs.input.focus();
+    },
+
+    async loadAllHouses() {
+      this.houses = await fetch(`${this.$store.getters.getHousesURL}/`).then((response) =>
+        response.json()
+      );
+    },
+
+    async loadAllRoutes() {
+      this.allRoutes = await fetch(`${this.$store.getters.getRoutesURL}/`).then((response) =>
+        response.json()
+      );
+    },
+
+    async loadAllRoutesComps() {
+      this.routesComps = await fetch(`${this.$store.getters.getRouteCompsURL}/`).then((response) =>
+        response.json()
+      );
+    },
+
     showAlert(error) {
       this.$swal(error);
     },
     submitRouteForm() {
-      this.$emit("submit");
+      // this.$emit("submit");
       if (this.route.route_id === undefined) {
         this.createRoute();
       } else {
@@ -190,7 +231,7 @@ export default {
         this.createRouteComp();
       } else {
         this.editRouteComp();
-        console.log("edit end")
+        console.log("edit end");
       }
     },
 
@@ -255,7 +296,6 @@ export default {
     },
 
     async routeCompEditFormVisible(routeComp) {
-      console.log("Edit rC", routeComp);
       this.$data.routeComp = await routeComp;
       this.dialogVisible = true;
     },
@@ -298,6 +338,4 @@ export default {
   font-size: 20px;
   /* color: rebeccapurple */
 }
-
-
 </style>

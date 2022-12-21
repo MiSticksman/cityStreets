@@ -8,12 +8,12 @@
 
 <script>
 
-import Navbar from "./components/Navbar.vue";
+import Navbar from "@/components/Navbar.vue";
+import Pagination from "@/components/Pagination.vue"
 export default {
     name: 'App',
-
     components: {
-        Navbar
+        Navbar, Pagination
     }
 }
 </script>
@@ -39,6 +39,5 @@ export default {
     color: teal;
     border: 1px solid teal;
 }
-
 
 </style>
