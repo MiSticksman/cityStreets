@@ -11,19 +11,6 @@
             {{ p }}
         </div>
     </div>
-
-    <!-- <div>
-        <ul>
-            <li class="pagination" v-for="p in totalPages" :keys="p">
-                <button 
-                    class="pagination-button"
-                    :class="{active: currentPage === p }"
-                    @click="changePage(p)"> 
-                    {{ p }}
-                </button>
-            </li>
-        </ul>
-    </div> -->
 </template>
 
 <script>

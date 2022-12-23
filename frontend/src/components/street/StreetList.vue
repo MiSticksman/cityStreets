@@ -1,5 +1,5 @@
 <template>
-  <form class="streetForm" @submit.prevent="submitForm">
+  <form class="streetForm" @submit.prevent="submitForm" >
     <input
       ref="input"
       type="text"
@@ -13,15 +13,16 @@
   <!-- <my-select
         v-bind="selectedSort"
         :options="sortStreets"/> -->
-  <!-- <select v-model="selectedSort">
+        
+  <select v-model="selectedOrder">
     <option disabled value="">Select from list</option>
     <option
-      v-for="option in sortStreets"
+      v-for="option in orderStreets"
       :key="option.value"
       :value="option.value">
       {{ option.name }}
     </option>
-  </select> -->
+  </select>
 
   <div v-if="this.curStreets.length > 0">
     <h1>Street list</h1>
@@ -31,12 +32,13 @@
       class="street"
       v-for="(street, index) in this.curStreets"
       :key="street.street_id"
-      @dblclick="($data.street = street), this.$refs.input.focus()"
+      @dblclick="($data.street = street), 
+      this.$refs.input.focus()"
     >
       <div>
         <strong>#{{ index + 1 }}</strong>
       </div>
-      <div class="streetNames">{{ street.street_name }}</div>
+      <div class="streetNames" ref="street">{{ street.street_name }}</div>
       <button class="btn btn-danger btn-sm mx-1" @click="deleteStreet(street)">
         Remove
       </button>
@@ -45,6 +47,7 @@
       :total="total"
       :limit="curStreets.length"
       @page-changed="loadStreets"
+      @selected-order="selectedOrder"
     />
   </div>
   <div v-else>
@@ -53,7 +56,6 @@
 </template>
 
 <script>
-import { isProxy, toRaw } from "vue";
 import Pagination from "@/components/Pagination.vue";
 export default {
   components: {
@@ -66,11 +68,12 @@ export default {
       allStreets: [],
       page: 1,
       total: 0,
+      curPage: 0,
       dialogVisible: false,
-      selectedSort: "",
-      sortStreets: [
-        { value: "title", name: "alphabetically" },
-        { value: "id", name: "by adding" },
+      selectedOrder: "",
+      orderStreets: [
+        { value: "street_name", name: "alphabetically" },
+        { value: "-street_id", name: "by adding" },
       ],
     };
   },
@@ -79,6 +82,7 @@ export default {
   },
   methods: {
     async loadStreets(pageNumber) {
+      this.curPage = pageNumber;
       this.curStreets = await fetch(
         `${this.$store.getters.getStreetsURL}/?page=${pageNumber}`
       )
@@ -138,10 +142,7 @@ export default {
       })
         .then(async (response) => {
           const data = await response.json();
-          if (response.ok) {
-            // this.$emit('submitForm', await this.$store.getters.getStreets)
-            // location.reload()
-          } else {
+          if (!response.ok) {
             const error = (data && data.message) || response.status;
             return Promise.reject(error);
           }
@@ -151,7 +152,8 @@ export default {
           this.showAlert("A street with that name already exists!");
           console.error("There was an error!", error.$data);
         });
-
+      
+      console.log("this.street", this.$refs.tests[1])
       this.street = {};
     },
 
@@ -159,20 +161,19 @@ export default {
       this.$emit("deleteStreet", street);
     },
   },
-  // watch: {
-  //   selectedSort(newValue) {
-  //     // this.$store.commit('sortStreets')
-  //     let streets = this.$store.commit('sortStreets')
-  //     // if (isProxy(this.$store.state.streets)){
-  //     //     console.log('isProxy')
-  //     //     streets = toRaw(this.$store.state.streets)
-  //     // }
-  //     console.log('str', streets)
-  //     // streets = streets.sort()
-  //     // console.log('strSort', streets)
-  //     return streets
-  //   },
-  // }
+  watch: {
+    async selectedOrder(newValue) {
+      console.log("selected_sort", this.selectedOrder)
+      console.log("this.page", this.curPage)
+      this.curStreets = await fetch(
+        `${this.$store.getters.getStreetsURL}/?page=${this.curPage}&ordering=${this.selectedOrder}`
+      )
+        .then((response) => response.json())
+        .then((response) => {
+          return response.results;
+        });
+    },
+  }
 };
 </script>
 
