@@ -175,13 +175,16 @@ export default {
 
     async searchForm() {
       this.curStreets = await fetch(
-        `${this.$store.getters.getStreetsURL}/?page=${this.curPage}&search=${this.search}`
+        `${this.$store.getters.getStreetsURL}/?search=${this.search}`
       )
         .then((response) => response.json())
-        .then((response) => {
-          return response.results;
-        });
+        if(this.search === "") {
+          console.log('aaaa')
+          this.loadStreets(this.curPage);
+        }
     }
+     
+    
   },
   watch: {
     async selectedOrder(newValue) {
@@ -195,7 +198,7 @@ export default {
           return response.results;
         });
     },
-  }
+  },
 };
 </script>
 

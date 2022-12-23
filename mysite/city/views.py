@@ -37,7 +37,7 @@ class StreetView(viewsets.ModelViewSet):
                        filters.OrderingFilter]
     
     filterset_fields = ['street_id', 'street_name']
-    search_fields = ['street_id', 'street_name']
+    search_fields = ['street_name']
     ordering_fields = ['street_id', 'street_name']
 
 
@@ -53,7 +53,6 @@ class HouseViewPagination(PageNumberPagination):
 
 class HouseView(viewsets.ModelViewSet):
     serializer_class = HouseSerializer
-    # queryStreetSet = Street.objects.all().order_by('street_name')
     queryset = House.objects.all().order_by('house_number')
     pagination_class = HouseViewPagination
 
