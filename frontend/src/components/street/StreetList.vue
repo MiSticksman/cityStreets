@@ -18,18 +18,16 @@
   <h1>Street list</h1>
   <form class="streetForm" @submit.prevent="searchForm" >
     <input
-      ref="searchInput"
       type="text"
       class="input"
-      placeholder="seach by street name"
+      placeholder="seach..."
       v-model="this.search"
     />
     <button class="btn btn-success">Search</button>
   </form>
 
   <div v-if="this.curStreets.length > 0">
-    
-    
+
     <select v-model="selectedOrder">
     <option disabled value="">Order by</option>
     <option
@@ -39,8 +37,7 @@
       {{ option.name }}
     </option>
   </select>
-
-  
+ 
     <div
       class="street"
       v-for="(street, index) in this.curStreets"
@@ -85,8 +82,8 @@ export default {
       dialogVisible: false,
       selectedOrder: "",
       orderStreets: [
-        { value: "street_name", name: "alphabetically" },
         { value: "-street_id", name: "by adding" },
+        { value: "street_name", name: "by alphabetically" },
       ],
       search: '',
     };
@@ -141,7 +138,7 @@ export default {
           this.postId = data.id;
         })
         .catch((error) => {
-          this.showAlert("A street with that name already exists!");
+          this.showAlert('error!');
           console.error("There was an error!", error.$data);
         });
       this.street.street_name = "";
@@ -163,7 +160,7 @@ export default {
           this.postId = data.id;
         })
         .catch((error) => {
-          this.showAlert("A street with that name already exists!");
+          this.showAlert('error!');
           console.error("There was an error!", error.$data);
         });
       this.street = {};
@@ -179,12 +176,9 @@ export default {
       )
         .then((response) => response.json())
         if(this.search === "") {
-          console.log('aaaa')
           this.loadStreets(this.curPage);
         }
     }
-     
-    
   },
   watch: {
     async selectedOrder(newValue) {

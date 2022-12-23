@@ -24,9 +24,29 @@
     <button class="btn btn-success">Submit</button>
   </form>
 
+  <h1>House list</h1>
+  <form class="houseForm" @submit.prevent="searchForm">
+    <input
+      type="text"
+      class="input"
+      placeholder="seach..."
+      v-model="this.search"
+    />
+    <button class="btn btn-success">Search</button>
+  </form>
+
   <div v-if="this.curHouses.length > 0">
-    <h1>House list</h1>
-    
+    <select v-model="selectedOrder">
+      <option disabled value="">Order by</option>
+      <option
+        v-for="option in orderHouses"
+        :key="option.value"
+        :value="option.value"
+      >
+        {{ option.name }}
+      </option>
+    </select>
+
     <div
       v-for="(house, index) in this.curHouses"
       :key="house.house_id"
@@ -72,7 +92,15 @@ export default {
       page: 1,
       total: 0,
       streets: [],
+      curPage: 0,
       dialogVisible: false,
+      selectedOrder: "",
+      orderHouses: [
+        { value: "street__street_name", name: "by street" },
+        { value: "-house_id", name: "by adding" },
+        { value: "house_number", name: "by house number" },
+      ],
+      search: "",
     };
   },
   created() {
@@ -81,6 +109,7 @@ export default {
   },
   methods: {
     async loadHouses(pageNumber) {
+      this.curPage = pageNumber;
       this.curHouses = await fetch(
         `${this.$store.getters.getHousesURL}/?page=${pageNumber}`
       )
@@ -89,12 +118,12 @@ export default {
           this.total = response.count;
           return response.results;
         });
-        this.$refs.input.focus();
+      this.$refs.input.focus();
     },
 
     async loadAllStreets() {
-      this.streets = await fetch(`${this.$store.getters.getStreetsURL}/`).then((response) =>
-        response.json()
+      this.streets = await fetch(`${this.$store.getters.getStreetsURL}/`).then(
+        (response) => response.json()
       );
     },
 
@@ -128,7 +157,7 @@ export default {
           this.postId = data.id;
         })
         .catch((error) => {
-          this.showAlert("A house with that street and number already exists!");
+          this.showAlert("error!");
           console.error("There was an error!", error.$data);
         });
       console.log("house:", this.house);
@@ -155,7 +184,7 @@ export default {
           this.postId = data.id;
         })
         .catch((error) => {
-          this.showAlert("A house with that street and number already exists!");
+          this.showAlert("error!");
           console.error("There was an error!", error.$data);
         });
       this.house = {};
@@ -164,15 +193,37 @@ export default {
     async deleteHouse(house) {
       this.$emit("deleteHouse", house);
     },
+    async searchForm() {
+      this.curHouses = await fetch(
+        `${this.$store.getters.getHousesURL}/?search=${this.search}`
+      ).then((response) => response.json());
+      if (this.search === "") {
+        this.loadHouses(this.curPage);
+      }
+    },
+    async searchForm() {
+      this.curHouses = await fetch(
+        `${this.$store.getters.getHousesURL}/?search=${this.search}`
+      )
+        .then((response) => response.json())
+        if(this.search === "") {
+          this.loadHouses(this.curPage);
+        }
+    }
   },
-  // watch: {
-  //     house: {
-  //         handler(newValue) {
-  //             console.log("val",newValue)
-  //         },
-  //         deep: true
-  //     }
-  // }
+  watch: {
+    async selectedOrder(newValue) {
+      console.log("selected_sort", this.selectedOrder);
+      console.log("this.page", this.curPage);
+      this.curHouses = await fetch(
+        `${this.$store.getters.getHousesURL}/?page=${this.curPage}&ordering=${this.selectedOrder}`
+      )
+        .then((response) => response.json())
+        .then((response) => {
+          return response.results;
+        });
+    },
+  },
 };
 </script>
 
@@ -181,6 +232,7 @@ export default {
   display: flex;
   width: 70%;
   flex-direction: row;
+  padding-bottom: 10px;
 }
 .input {
   width: 100%;

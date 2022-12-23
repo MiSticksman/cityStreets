@@ -7,7 +7,7 @@
       placeholder="Route name"
       v-model="route.route_name"
     />
-    <button class="btn btn-success">Submit</button>
+    <button class="btn btn-success">Submit</button>``
   </form>
 
   <my-dialog v-model:show="dialogVisible">
@@ -45,14 +45,33 @@
     Add route component
   </button>
 
+  <h1>Route list</h1>
+  <form class="routeForm" @submit.prevent="searchForm" >
+    <input
+      type="text"
+      class="input"
+      placeholder="seach by route name..."
+      v-model="this.search"
+    />
+    <button class="btn btn-success">Search</button>
+  </form>
   <div v-if="this.curRoutes.length > 0">
-    <h1>Route list</h1>
+    
+    <select v-model="selectedOrder">
+    <option disabled value="">Order by</option>
+    <option
+      v-for="option in orderRoutes"
+      :key="option.value"
+      :value="option.value">
+      {{ option.name }}
+    </option>
+  </select>
     
     <div
       class="route"
       v-for="(route, index) in this.curRoutes"
       :key="route.route_id"
-      @dblclick="($data.route = route), this.$refs.inputRoute.focus()"
+      @dblclick="($data.route = route), this.$refs.input.focus()"
     >
       <div>
         <strong>#{{ index + 1 }}</strong>
@@ -69,8 +88,7 @@
           </div>
           <div>
             <div class="routeCompNames">
-              {{ routeComp.street_name }}, {{ routeComp.house_number }}:
-              {{ routeComp.follow_up_number }}
+              {{ routeComp.street_name }}, {{ routeComp.house_number }}
             </div>
           </div>
 
@@ -120,7 +138,14 @@ export default {
       routesComps: [],
       page: 1,
       total: 0,
+      curPage: 0,
       dialogVisible: false,
+      selectedOrder: "",
+      orderRoutes: [
+        { value: "-route_id", name: "by adding" },
+        { value: "route_name", name: "by alphabetically" },
+      ],
+      search: '',
     };
   },
   created() {
@@ -131,6 +156,7 @@ export default {
   },
   methods: {
     async loadRoutes(pageNumber) {
+      this.curPage = pageNumber;
       this.curRoutes = await fetch(
         `${this.$store.getters.getRoutesURL}/?page=${pageNumber}`
       )
@@ -191,7 +217,7 @@ export default {
           this.postId = data.id;
         })
         .catch((error) => {
-          this.showAlert("A route with that name already exists!");
+          this.showAlert("error!");
           console.error("There was an error!", error.$data);
         });
       this.route = {};
@@ -215,7 +241,7 @@ export default {
           this.postId = data.id;
         })
         .catch((error) => {
-          this.showAlert("A route with that name already exists!");
+          this.showAlert("error!");
           console.error("There was an error!", error.$data);
         });
       this.route = {};
@@ -299,6 +325,28 @@ export default {
       this.$data.routeComp = await routeComp;
       this.dialogVisible = true;
     },
+    async searchForm() {
+      this.curRoutes = await fetch(
+        `${this.$store.getters.getRoutesURL}/?search=${this.search}`
+      )
+        .then((response) => response.json())
+        if(this.search === "") {
+          this.loadRoutes(this.curPage);
+        }
+    }
+  },
+  watch: {
+    async selectedOrder(newValue) {
+      console.log("selected_sort", this.selectedOrder)
+      console.log("this.page", this.curPage)
+      this.curRoutes = await fetch(
+        `${this.$store.getters.getRoutesURL}/?page=${this.curPage}&ordering=${this.selectedOrder}`
+      )
+        .then((response) => response.json())
+        .then((response) => {
+          return response.results;
+        });
+    },
   },
 };
 </script>
@@ -308,6 +356,7 @@ export default {
   display: flex;
   width: 70%;
   flex-direction: row;
+  padding-bottom: 10px;
 }
 
 .input {

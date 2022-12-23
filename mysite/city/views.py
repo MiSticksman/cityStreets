@@ -55,6 +55,13 @@ class HouseView(viewsets.ModelViewSet):
     serializer_class = HouseSerializer
     queryset = House.objects.all().order_by('house_number')
     pagination_class = HouseViewPagination
+    
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, 
+                       filters.OrderingFilter]
+    
+    filterset_fields = ['house_id', 'house_number', 'street__street_name']
+    search_fields = ['house_number', 'street__street_name']
+    ordering_fields = ['house_id', 'house_number', 'street__street_name']
 
     
 
@@ -78,8 +85,25 @@ class RouteView(viewsets.ModelViewSet):
     serializer_class = RouteSerializer
     queryset = Route.objects.all().order_by('route_name')
     pagination_class = RouteViewPagination
+    
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, 
+                       filters.OrderingFilter]
+    
+    filterset_fields = ['route_id', 'route_name']
+    search_fields = ['route_name']
+    ordering_fields = ['route_id', 'route_name']
 
 
 class RouteComponentsView(viewsets.ModelViewSet):
     serializer_class = RouteComponentsSerializer
     queryset = RouteComponents.objects.all().order_by('follow_up_number')
+    
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, 
+                       filters.OrderingFilter]
+    
+    filterset_fields = ['route_comp_id', 'follow_up_number', 
+                        'house__house_number', 'house__street__street_name']
+    search_fields = ['house__house_number', 'house__street__street_name', 
+                     'follow_up_number']
+    ordering_fields = ['route_comp_id', 'follow_up_number',
+                       'house__house_number', 'house__street__street_name',]
