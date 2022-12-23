@@ -14,8 +14,24 @@
         v-bind="selectedSort"
         :options="sortStreets"/> -->
         
-  <select v-model="selectedOrder">
-    <option disabled value="">Select from list</option>
+  
+  <h1>Street list</h1>
+  <form class="streetForm" @submit.prevent="searchForm" >
+    <input
+      ref="searchInput"
+      type="text"
+      class="input"
+      placeholder="seach by street name"
+      v-model="this.search"
+    />
+    <button class="btn btn-success">Search</button>
+  </form>
+
+  <div v-if="this.curStreets.length > 0">
+    
+    
+    <select v-model="selectedOrder">
+    <option disabled value="">Order by</option>
     <option
       v-for="option in orderStreets"
       :key="option.value"
@@ -24,10 +40,7 @@
     </option>
   </select>
 
-  <div v-if="this.curStreets.length > 0">
-    <h1>Street list</h1>
-    
-    
+  
     <div
       class="street"
       v-for="(street, index) in this.curStreets"
@@ -75,6 +88,7 @@ export default {
         { value: "street_name", name: "alphabetically" },
         { value: "-street_id", name: "by adding" },
       ],
+      search: '',
     };
   },
   created() {
@@ -152,14 +166,22 @@ export default {
           this.showAlert("A street with that name already exists!");
           console.error("There was an error!", error.$data);
         });
-      
-      console.log("this.street", this.$refs.tests[1])
       this.street = {};
     },
 
     async deleteStreet(street) {
       this.$emit("deleteStreet", street);
     },
+
+    async searchForm() {
+      this.curStreets = await fetch(
+        `${this.$store.getters.getStreetsURL}/?page=${this.curPage}&search=${this.search}`
+      )
+        .then((response) => response.json())
+        .then((response) => {
+          return response.results;
+        });
+    }
   },
   watch: {
     async selectedOrder(newValue) {
@@ -182,6 +204,7 @@ export default {
   display: flex;
   width: 70%;
   flex-direction: row;
+  padding-bottom: 10px;
 }
 
 .input {
