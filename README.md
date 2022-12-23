@@ -2,4 +2,4 @@
 
 
 Rest api web-app 'cityStreets'.
-Django REST Api + VueJS.
+Django REST Framework + VueJS.
