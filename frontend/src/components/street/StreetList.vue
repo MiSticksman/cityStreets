@@ -10,11 +10,6 @@
     <button class="btn btn-success">Submit</button>
   </form>
 
-  <!-- <my-select
-        v-bind="selectedSort"
-        :options="sortStreets"/> -->
-        
-  
   <h1>Street list</h1>
   <form class="streetForm" @submit.prevent="searchForm" >
     <input
