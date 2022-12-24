@@ -6,7 +6,7 @@ class StreetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Street
         fields = ('street_id', 'street_name')
-
+    
 
 class HouseSerializer(serializers.ModelSerializer):
     # street = StreetSerializer(read_only=True)
@@ -14,12 +14,7 @@ class HouseSerializer(serializers.ModelSerializer):
     class Meta:
         model = House
         fields = ('house_id', 'street', 'house_number', 'street_name')
-
-    # def create(self, validated_data):
-    #     street_data = validated_data.get('street')
-    #     print(street_data)
-    #     street = Street.objects.get(pk=street_data.street_id)
-    #     House.objects.create(street=street, **validated_data)
+        
 
 class RouteSerializer(serializers.ModelSerializer):
     class Meta:

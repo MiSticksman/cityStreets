@@ -157,7 +157,7 @@ export default {
           this.postId = data.id;
         })
         .catch((error) => {
-          this.showAlert("error!");
+          this.showAlert("error while create");
           console.error("There was an error!", error.$data);
         });
       console.log("house:", this.house);
@@ -184,7 +184,7 @@ export default {
           this.postId = data.id;
         })
         .catch((error) => {
-          this.showAlert("error!");
+          this.showAlert("error while update!");
           console.error("There was an error!", error.$data);
         });
       this.house = {};

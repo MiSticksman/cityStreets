@@ -7,7 +7,7 @@
       placeholder="Route name"
       v-model="route.route_name"
     />
-    <button class="btn btn-success">Submit</button>``
+    <button class="btn btn-success">Submit</button>
   </form>
 
   <my-dialog v-model:show="dialogVisible">
@@ -217,7 +217,7 @@ export default {
           this.postId = data.id;
         })
         .catch((error) => {
-          this.showAlert("error!");
+          this.showAlert("error while create");
           console.error("There was an error!", error.$data);
         });
       this.route = {};
@@ -241,7 +241,7 @@ export default {
           this.postId = data.id;
         })
         .catch((error) => {
-          this.showAlert("error!");
+          this.showAlert("error while update");
           console.error("There was an error!", error.$data);
         });
       this.route = {};
@@ -280,7 +280,7 @@ export default {
           this.postId = data.id;
         })
         .catch((error) => {
-          this.showAlert("A route with that name already exists!");
+          this.showAlert("error while create");
           console.error("There was an error!", error.$data);
         });
       this.routeComp = {};
@@ -307,7 +307,7 @@ export default {
           this.postId = data.id;
         })
         .catch((error) => {
-          this.showAlert("A route with that name already exists!");
+          this.showAlert("error while update");
           console.error("There was an error!", error.$data);
         });
       this.routeComp = {};

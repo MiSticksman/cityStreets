@@ -129,7 +129,6 @@ export default {
         .then(async (response) => {
           const data = await response.json();
           if (response.ok) {
-            // this.$emit('submitForm', await this.$store.getters.getStreets)
             location.reload();
           } else {
             const error = (data && data.message) || response.status;
@@ -138,8 +137,8 @@ export default {
           this.postId = data.id;
         })
         .catch((error) => {
-          this.showAlert('error!');
-          console.error("There was an error!", error.$data);
+          this.showAlert('error while create');
+          console.error("There was an error!", error);
         });
       this.street.street_name = "";
     },
@@ -160,7 +159,7 @@ export default {
           this.postId = data.id;
         })
         .catch((error) => {
-          this.showAlert('error!');
+          this.showAlert('error while update');
           console.error("There was an error!", error.$data);
         });
       this.street = {};
