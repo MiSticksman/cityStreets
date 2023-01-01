@@ -8,6 +8,9 @@
       v-model="street.street_name"
     />
     <button class="btn btn-success">Submit</button>
+    <button class="btn btn-primary"
+    @click="clearForm"
+    >Clear </button>
   </form>
 
   <h1>Street list</h1>
@@ -62,7 +65,9 @@
 
 <script>
 import Pagination from "@/components/Pagination.vue";
+import clearInputMixin from "@/mixins/clearInputMixin";
 export default {
+  mixins: [clearInputMixin],
   components: {
     Pagination,
   },
@@ -172,7 +177,10 @@ export default {
         if(this.search === "") {
           this.loadStreets(this.curPage);
         }
-    }
+    },
+    clearForm() {
+      this.$refs.input.reset();
+    },
   },
   watch: {
     async selectedOrder(newValue) {

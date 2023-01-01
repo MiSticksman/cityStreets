@@ -8,6 +8,9 @@
       v-model="route.route_name"
     />
     <button class="btn btn-success">Submit</button>
+    <button class="btn btn-primary"
+    @click="clearForm"
+    >Clear </button>
   </form>
 
   <my-dialog v-model:show="dialogVisible">
@@ -333,7 +336,10 @@ export default {
         if(this.search === "") {
           this.loadRoutes(this.curPage);
         }
-    }
+    },
+    clearForm() {
+      this.$refs.input.reset();
+    },
   },
   watch: {
     async selectedOrder(newValue) {

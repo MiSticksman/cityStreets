@@ -22,6 +22,9 @@
       step="0.5"
     />
     <button class="btn btn-success">Submit</button>
+    <button class="btn btn-primary"
+    @click="clearForm"
+    >Clear </button>
   </form>
 
   <h1>House list</h1>
@@ -209,7 +212,10 @@ export default {
         if(this.search === "") {
           this.loadHouses(this.curPage);
         }
-    }
+    },
+    clearForm() {
+      this.$refs.input.reset();
+    },
   },
   watch: {
     async selectedOrder(newValue) {
